@@ -8,7 +8,7 @@ namespace EventLINQAndTimers
 {
     class Program
     {
-        static int deadcount = 0;
+        public static List<string> deads = new List<string>();
 
         static void Main(string[] args)
         {
@@ -16,6 +16,8 @@ namespace EventLINQAndTimers
             List<Character> characters = new List<Character>();
             //name list initialisation
             List<string> names = new List<string> { "Diego", "Adrien", "Simon", "Pierre", "Paul", "Jacques", "Michel", "Uriel", "Achille", "Tom", "Shérine", "Athena", "Jeanne", "Laura" };
+
+
             //characters creation
             foreach (string name in names)
             {
@@ -35,23 +37,30 @@ namespace EventLINQAndTimers
 
                 //governement subscribe on character death event to produce death certificate
                 character.IsDead += government.DeathCertificate;
-                character.IsDead += countTheDead;
             }
 
             //organisation of the first election
             government.Election();
 
-            while (deadcount < characters.Count)
+            int deadsNumber = 0;
+            //compare deads number to registered characters number
+            while (deadsNumber < names.Count)
             {
-
+                deadsNumber = countTheDead2(characters);
             }
 
             Console.WriteLine("Everybody is dead");
+            Console.ForegroundColor = ConsoleColor.White;
         }
 
-        public static void countTheDead(Object sender, DeathEventArgs args)
+        public static int countTheDead2(List<Character> characters)
         {
-            deadcount++;
+            int result = 0;
+            foreach (Character character in characters)
+            {
+                if (character.isDead) result++;
+            }
+            return result;
         }
     }
 }

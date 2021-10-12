@@ -20,6 +20,7 @@ namespace EventLINQAndTimers
     {
         public string Name;
         public int LifeTime;
+        public bool isDead;
         public HashSet<Character> friends =  new HashSet<Character>();
         public HashSet<Character> enemies = new HashSet<Character>();
         Random rand;
@@ -49,7 +50,6 @@ namespace EventLINQAndTimers
             //create a random customized for this character
             rand = new Random(NameToInt() + (int)DateTime.Now.Ticks);
             LifeTime = lifetime;
-            timer = new Timer(lifetime);
         }
 
         //random lifetime constructor
@@ -58,8 +58,7 @@ namespace EventLINQAndTimers
             Name = name;
             //create a random customized for this character
             rand = new Random(NameToInt() + (int)DateTime.Now.Ticks);
-            LifeTime = rand.Next(500, 1000);
-            timer = new Timer(LifeTime);
+            LifeTime = rand.Next(500, 5000);
         }
 
         #endregion
@@ -69,21 +68,28 @@ namespace EventLINQAndTimers
         //Lifetime management
         public void StartLife()
         {
+            isDead = false;
             Console.WriteLine("{0} starts his life.", Name);
             //wait for lifetime duration
+            timer = new Timer(LifeTime);
             timer.Enabled = true;
+            timer.AutoReset = false;
             timer.Elapsed += OnEndLifeEvent;
         }
 
         private void OnEndLifeEvent(Object source, ElapsedEventArgs e)
         {
+            Console.ForegroundColor = ConsoleColor.Blue;
             Console.WriteLine("{0} is dead.", Name);
-
+            Console.ForegroundColor = ConsoleColor.White;
+            isDead = true;
             //I don't need to cry fro my friends anymore
             //because i'm dead
+            Console.ForegroundColor = ConsoleColor.Green;
             foreach (Character friend in friends)
             {
                 friend.IsDead -= Cry;
+                Console.WriteLine("{0} unsuscribe from friend {1}", Name, friend.Name);
             }
 
             //I don't need to laugh at my enemies anymore
@@ -91,12 +97,14 @@ namespace EventLINQAndTimers
             foreach (Character enemy in enemies)
             {
                 enemy.IsDead -= Enjoy;
+                Console.WriteLine("{0} unsuscribe from enemy {1}", Name, enemy.Name);
             }
 
             //I don't need to honour the president
             //because i'm dead
             Government.president.IsDead -= Honour;
 
+            Console.ForegroundColor = ConsoleColor.White;
             DeathEventArgs args = new DeathEventArgs();
             args.Body = this;
             args.DeathNote = DateTime.Now;
@@ -211,6 +219,9 @@ namespace EventLINQAndTimers
                 enemies.Add(selected);
                 //I will enjoy his death
                 selected.IsDead += Enjoy;
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine("{0} is enemy with {1}", Name, selected.Name);
+                Console.ForegroundColor = ConsoleColor.White;
                 //remove this character from the copy list so he won't be reselected in next loop
                 PossibleEnemies.Remove(selected);
                 //remove this character from the original list so he won't be processing when choosing enemies
@@ -240,6 +251,9 @@ namespace EventLINQAndTimers
                 friends.Add(selected);
                 //I will cry for his death
                 selected.IsDead += Cry;
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine("{0} is friend with {1}", Name, selected.Name);
+                Console.ForegroundColor = ConsoleColor.White;
                 //remove this character from the copy list so he won't be reselected in next loop
                 Friendable.Remove(selected);
             }
@@ -286,6 +300,9 @@ namespace EventLINQAndTimers
                 enemies.Add(selected);
                 //I will enjoy his death
                 selected.IsDead += Enjoy;
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine("{0} is enemy with {1}", Name, selected.Name);
+                Console.ForegroundColor = ConsoleColor.White;
                 //remove this character from the copy list so he won't be reselected in next loop
                 PossibleEnemies.Remove(selected);
                 //remove this character from the original list so he won't be processing when choosing enemies
@@ -315,6 +332,9 @@ namespace EventLINQAndTimers
                 friends.Add(selected);
                 //I will cry for his death
                 selected.IsDead += Cry;
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine("{0} is friend with {1}", Name, selected.Name);
+                Console.ForegroundColor = ConsoleColor.White;
                 //remove this character from the copy list so he won't be reselected in next loop
                 Friendable.Remove(selected);
             }
