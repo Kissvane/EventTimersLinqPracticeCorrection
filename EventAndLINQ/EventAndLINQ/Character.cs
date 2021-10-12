@@ -24,15 +24,14 @@ namespace EventLINQAndTimers
         public HashSet<Character> friends =  new HashSet<Character>();
         public HashSet<Character> enemies = new HashSet<Character>();
         Random rand;
-        Timer timer;
 
         #region Death event
 
-        public event DeathEventHandler IsDead;
+        public event DeathEventHandler death;
 
         protected virtual void OnCharacterDead(DeathEventArgs e)
         {
-            DeathEventHandler handler = IsDead;
+            DeathEventHandler handler = death;
             if (handler != null)
             {
                 handler(this, e);
@@ -71,7 +70,7 @@ namespace EventLINQAndTimers
             isDead = false;
             Console.WriteLine("{0} starts his life.", Name);
             //wait for lifetime duration
-            timer = new Timer(LifeTime);
+            Timer timer = new Timer(LifeTime);
             timer.Enabled = true;
             timer.AutoReset = false;
             timer.Elapsed += OnEndLifeEvent;
@@ -88,7 +87,7 @@ namespace EventLINQAndTimers
             Console.ForegroundColor = ConsoleColor.Green;
             foreach (Character friend in friends)
             {
-                friend.IsDead -= Cry;
+                friend.death -= Cry;
                 Console.WriteLine("{0} unsuscribe from friend {1}", Name, friend.Name);
             }
 
@@ -96,13 +95,13 @@ namespace EventLINQAndTimers
             //because i'm dead
             foreach (Character enemy in enemies)
             {
-                enemy.IsDead -= Enjoy;
+                enemy.death -= Enjoy;
                 Console.WriteLine("{0} unsuscribe from enemy {1}", Name, enemy.Name);
             }
 
             //I don't need to honour the president
             //because i'm dead
-            Government.president.IsDead -= Honour;
+            Government.president.death -= Honour;
 
             Console.ForegroundColor = ConsoleColor.White;
             DeathEventArgs args = new DeathEventArgs();
@@ -117,51 +116,31 @@ namespace EventLINQAndTimers
         //After that nobody will cry or laugh when he dies
         public void BreakLinks()
         {
-            IsDead = null;
+            death = null;
         }
 
         #endregion
 
         #region Death reactions
 
-        public void Enjoy(Object sender, EventArgs args)
-        {
-            Character deadman = (Character)sender;
-            Console.WriteLine("{0} enjoy the death {1}", Name, deadman.Name);
-            enemies.Remove(deadman);
-        }
-
-        public void Cry(Object sender, EventArgs args)
-        {
-            Character deadman = (Character)sender;
-            Console.WriteLine("{0} cry for {1}", Name, deadman.Name);
-            friends.Remove(deadman);
-        }
-
-        public void Honour(Object sender, EventArgs args)
-        {
-            Character deadman = (Character)sender;
-            if (enemies.Contains(deadman))
-            {
-                enemies.Remove(deadman);
-                Console.WriteLine("{0} stay at home for {1} death", Name, deadman.Name);
-            }
-            else
-            {
-                Console.WriteLine("{0} honour {1}", Name, deadman.Name);
-            }
-        }
-
         public void Enjoy(Object sender, DeathEventArgs args)
         {
             Console.WriteLine("{0} enjoy the death of {1}", Name, args.Body.Name);
             enemies.Remove(args.Body);
+            args.Body.death -= Enjoy;
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("{0} unsuscribe from enjoying {1}'s death", Name, args.Body.Name);
+            Console.ForegroundColor = ConsoleColor.White;
         }
 
         public void Cry(Object sender, DeathEventArgs args)
         {
             Console.WriteLine("{0} cry for {1}", Name, args.Body.Name);
             friends.Remove(args.Body);
+            args.Body.death -= Cry;
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("{0} unsuscribe from crying {1}", Name, args.Body.Name);
+            Console.ForegroundColor = ConsoleColor.White;
         }
 
         public void Honour(Object sender, DeathEventArgs args)
@@ -175,6 +154,10 @@ namespace EventLINQAndTimers
             {
                 Console.WriteLine("{0} honour the name of {1}", Name, args.Body.Name);
             }
+            args.Body.death -= Honour;
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("{0} unsuscribe from honouring {1}", Name, args.Body.Name);
+            Console.ForegroundColor = ConsoleColor.White;
         }
 
         #endregion
@@ -218,7 +201,7 @@ namespace EventLINQAndTimers
                 //this character is an enemy now
                 enemies.Add(selected);
                 //I will enjoy his death
-                selected.IsDead += Enjoy;
+                selected.death += Enjoy;
                 Console.ForegroundColor = ConsoleColor.Green;
                 Console.WriteLine("{0} is enemy with {1}", Name, selected.Name);
                 Console.ForegroundColor = ConsoleColor.White;
@@ -250,7 +233,7 @@ namespace EventLINQAndTimers
                 //this character is an friend now
                 friends.Add(selected);
                 //I will cry for his death
-                selected.IsDead += Cry;
+                selected.death += Cry;
                 Console.ForegroundColor = ConsoleColor.Green;
                 Console.WriteLine("{0} is friend with {1}", Name, selected.Name);
                 Console.ForegroundColor = ConsoleColor.White;
@@ -299,7 +282,7 @@ namespace EventLINQAndTimers
                 //this character is an enemy now
                 enemies.Add(selected);
                 //I will enjoy his death
-                selected.IsDead += Enjoy;
+                selected.death += Enjoy;
                 Console.ForegroundColor = ConsoleColor.Green;
                 Console.WriteLine("{0} is enemy with {1}", Name, selected.Name);
                 Console.ForegroundColor = ConsoleColor.White;
@@ -331,7 +314,7 @@ namespace EventLINQAndTimers
                 //this character is an friend now
                 friends.Add(selected);
                 //I will cry for his death
-                selected.IsDead += Cry;
+                selected.death += Cry;
                 Console.ForegroundColor = ConsoleColor.Green;
                 Console.WriteLine("{0} is friend with {1}", Name, selected.Name);
                 Console.ForegroundColor = ConsoleColor.White;

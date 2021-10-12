@@ -65,12 +65,12 @@ namespace EventLINQAndTimers
             population.Remove(president);
 
             //make the governement aware of the president death again
-            president.IsDead += DeathCertificate;
+            president.death += DeathCertificate;
 
             foreach (Character character in population)
             {
                 //make everybody in the list honour the president when he dies
-                president.IsDead += character.Honour;
+                president.death += character.Honour;
             }
         }
 

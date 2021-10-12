@@ -36,7 +36,7 @@ namespace EventLINQAndTimers
                 character.ChooseEnemiesAndFriends(characters);
 
                 //governement subscribe on character death event to produce death certificate
-                character.IsDead += government.DeathCertificate;
+                character.death += government.DeathCertificate;
             }
 
             //organisation of the first election
@@ -49,8 +49,8 @@ namespace EventLINQAndTimers
                 deadsNumber = countTheDead2(characters);
             }
 
-            Console.WriteLine("Everybody is dead");
             Console.ForegroundColor = ConsoleColor.White;
+            Console.WriteLine("Everybody is dead");
         }
 
         public static int countTheDead2(List<Character> characters)
