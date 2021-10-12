@@ -6,8 +6,15 @@ using System.Threading.Tasks;
 
 namespace EventLINQAndTimers
 {
+    class Popularity
+    {
+        public int seenAsAFriend = 0;
+        public int seenAsAnEnemy = 0;
+    }
+
     class Government
     {
+        public Dictionary<Character, Popularity> popularityStats = new Dictionary<Character, Popularity>();
         //register of the living people
         public List<Character> livingPeople;
 
@@ -51,8 +58,16 @@ namespace EventLINQAndTimers
         public void Election()
         {
             List<Character> population = livingPeople;
-            //sorting people by onumber of friends and enemies
-            population.OrderBy(x => x.friends.Count).ThenByDescending(x => x.enemies.Count);
+
+            //calculate the popularity for each living character
+            foreach (Character character in livingPeople)
+            {
+                CalculatePopularity(character, livingPeople);
+            }
+
+            //sorting people by number of friends and enemies
+            population.OrderBy(x => popularityStats[x].seenAsAFriend).ThenByDescending(x => popularityStats[x].seenAsAnEnemy);
+            
             //select the first as president
             president = population[0];
             //announce the new president
@@ -71,6 +86,25 @@ namespace EventLINQAndTimers
             {
                 //make everybody in the list honour the president when he dies
                 president.death += character.Honour;
+            }
+        }
+
+        public void CalculatePopularity(Character character, List<Character> people)
+        {
+            popularityStats[character] = new Popularity();
+            //duplicate list to avoid modifying the orignal one
+            List<Character> characters = new List<Character>(people);
+            //remove the current characetr from the duplicated list
+            characters.Remove(character);
+            foreach (Character current in characters)
+            {
+                if (!current.isDead) 
+                {
+                    if (current.friends.Contains(character))
+                        popularityStats[character].seenAsAFriend++;
+                    else if (current.enemies.Contains(character))
+                        popularityStats[character].seenAsAnEnemy++;
+                }
             }
         }
 

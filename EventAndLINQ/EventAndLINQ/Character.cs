@@ -152,6 +152,8 @@ namespace EventLINQAndTimers
             }
             else
             {
+                if (friends.Contains(args.Body))
+                    friends.Remove(args.Body);
                 Console.WriteLine("{0} honour the name of {1}", Name, args.Body.Name);
             }
             args.Body.death -= Honour;

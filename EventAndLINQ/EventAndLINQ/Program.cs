@@ -46,14 +46,14 @@ namespace EventLINQAndTimers
             //compare deads number to registered characters number
             while (deadsNumber < names.Count)
             {
-                deadsNumber = countTheDead2(characters);
+                deadsNumber = CountTheDead(characters);
             }
 
             Console.ForegroundColor = ConsoleColor.White;
             Console.WriteLine("Everybody is dead");
         }
 
-        public static int countTheDead2(List<Character> characters)
+        public static int CountTheDead(List<Character> characters)
         {
             int result = 0;
             foreach (Character character in characters)
