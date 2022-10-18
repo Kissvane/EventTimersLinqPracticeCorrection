@@ -184,14 +184,8 @@ namespace EventLINQAndTimers
 
         public void ChooseNEnemies(List<Character> characters, int enemiesNumber)
         {
-            //get characters who don't think I'm an friend
-            IEnumerable<Character> query =
-                from c in characters
-                where !c.friends.Contains(this)
-                select c;
-
-            //transform query result in list
-            List<Character> PossibleEnemies = query.ToList();
+            List<Character> PossibleEnemies = 
+                characters.FindAll(c => !c.friends.Contains(this)).ToList();
 
             //limit the number of enemies to available enemies
             enemiesNumber = Math.Min(enemiesNumber, PossibleEnemies.Count);
@@ -216,22 +210,16 @@ namespace EventLINQAndTimers
 
         public void ChooseNFriends(List<Character> characters, int friendsNumber)
         {
-            //get characters who don't think I'm an enemy 
-            IEnumerable<Character> query =
-                from c in characters
-                where !c.enemies.Contains(this)
-                select c;
-
-            //transform query result in list
-            List<Character> Friendable = query.ToList();
+            List<Character> PossibleFriends = 
+                characters.FindAll(c => !c.enemies.Contains(this)).ToList();
 
             //limit the number of friends to available friends
-            friendsNumber = Math.Min(friendsNumber, Friendable.Count);
+            friendsNumber = Math.Min(friendsNumber, PossibleFriends.Count);
 
             for (int i = 0; i < friendsNumber; i++)
             {
                 //select a random friend
-                Character selected = Friendable[rand.Next(0, Friendable.Count)];
+                Character selected = PossibleFriends[rand.Next(0, PossibleFriends.Count)];
                 //this character is an friend now
                 friends.Add(selected);
                 //I will cry for his death
@@ -240,7 +228,8 @@ namespace EventLINQAndTimers
                 Console.WriteLine("{0} is friend with {1}", Name, selected.Name);
                 Console.ForegroundColor = ConsoleColor.White;
                 //remove this character from the copy list so he won't be reselected in next loop
-                Friendable.Remove(selected);
+                PossibleFriends.Remove(selected);
+                characters.Remove(selected);
             }
         }
 
@@ -265,14 +254,8 @@ namespace EventLINQAndTimers
 
         public void ChooseNEnemies(List<Character> characters)
         {
-            //get characters who don't think I'm an friend
-            IEnumerable<Character> query =
-                from c in characters
-                where !c.friends.Contains(this)
-                select c;
-
-            //transform query result in list
-            List<Character> PossibleEnemies = query.ToList();
+            List<Character> PossibleEnemies =
+                characters.FindAll(c => !c.friends.Contains(this)).ToList();
 
             //limit the number of enemies to available enemies
             int enemiesNumber = rand.Next(0, PossibleEnemies.Count);
@@ -297,22 +280,16 @@ namespace EventLINQAndTimers
 
         public void ChooseNFriends(List<Character> characters)
         {
-            //get characters who don't think I'm an enemy
-            IEnumerable<Character> query =
-                from c in characters
-                where !c.enemies.Contains(this)
-                select c;
-
-            //transform query result in list
-            List<Character> Friendable = query.ToList();
+            List<Character> PossibleFriends =
+                characters.FindAll(c => !c.enemies.Contains(this)).ToList();
 
             //limit the number of friends to available friends
-            int friendsNumber = rand.Next(0, Friendable.Count);
+            int friendsNumber = rand.Next(0, PossibleFriends.Count);
 
             for (int i = 0; i < friendsNumber; i++)
             {
                 //select a random friend
-                Character selected = Friendable[rand.Next(0, Friendable.Count)];
+                Character selected = PossibleFriends[rand.Next(0, PossibleFriends.Count)];
                 //this character is an friend now
                 friends.Add(selected);
                 //I will cry for his death
@@ -321,7 +298,7 @@ namespace EventLINQAndTimers
                 Console.WriteLine("{0} is friend with {1}", Name, selected.Name);
                 Console.ForegroundColor = ConsoleColor.White;
                 //remove this character from the copy list so he won't be reselected in next loop
-                Friendable.Remove(selected);
+                PossibleFriends.Remove(selected);
             }
         }
 
@@ -334,9 +311,11 @@ namespace EventLINQAndTimers
         int NameToInt()
         {
             int result = 0;
+            int i = 0;
             foreach (char c in Name)
             {
-                result += c;
+                i++;
+                result += c*i;
             }
             return result;
         }
